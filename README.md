@@ -65,7 +65,7 @@ depends/[mysql,bncsutil,boost]/include
 ```
 
 [MySQL c connector](https://dev.mysql.com/downloads/connector/c/)  
-[Boost](https://www.boost.org/) - You only need to build the following components: filesystem, system, dev, thread, chrono, date-time  
+[Boost](https://www.boost.org/) - You only need to build the following components: filesystem, system, thread, chrono, date-time  
 [Bncsutil](https://github.com/BNETDocs/bncsutil)
 
 # Installation

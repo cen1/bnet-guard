@@ -274,7 +274,7 @@ No specific commands.
 
 **spam** -  spams challenge status to online users
 
-**challenge | chal | c [player]** - starts a challenge. This is the main command for starting competitive games. Challenge must then be accepted by someone or by th player you challenged. The sign phase then begins where players sign into the game, followed by a pick phase.
+**challenge | chal | c [player]** - starts a challenge. This is the main command for starting competitive games. Challenge must then be accepted by someone or by the player you challenged. The sign phase then begins where players sign into the game, followed by a pick phase.
 
 ### Level 1 - regular player
 -----

@@ -1,0 +1,9 @@
+# no .a files and .exe files
+*.a
+*.exe
+*.suo
+*.user
+build/
+depends/boost/include/
+depends/mysql/include/
+depends/bncsutil/include/

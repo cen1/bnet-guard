@@ -356,7 +356,7 @@ No specific commands.
 
 **res** - reserve a slot. Once 10 players reserve, game will automatically be started. This is alternative way to host a professional game as opposed to direct challenge being issued.
 
-**sign [obs]** - sign up or the challenge
+**sign [obs]** - sign up for the challenge
 
 **out** - sign out of the challenge
 

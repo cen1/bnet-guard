@@ -17,7 +17,7 @@ TEST(TestCases, SanityTest) {
 
 		ASSERT_NE(a, v.end());
 		EXPECT_TRUE((*a >= 1) && (*a <= 3));
-		cout << "Loop " << i << endl;
+		cout << "Loop " << i << " selected " << *a << endl;
 	}
 
 	//One

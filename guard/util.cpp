@@ -22,6 +22,7 @@
 #include "util.h"
 
 #include <sys/stat.h>
+#include <random>
 
 BYTEARRAY UTIL_CreateByteArray( char *a, int size )
 {

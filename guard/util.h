@@ -21,6 +21,10 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include "includes.h"
+#include <iterator>
+#include <random>
+
 // byte arrays
 BYTEARRAY UTIL_CreateByteArray( char *a, int size );
 BYTEARRAY UTIL_CreateByteArray( unsigned char *a, int size );
@@ -94,5 +98,17 @@ uint32_t UTIL_Factorial( uint32_t x );
 
 #define nCr(n, r) (UTIL_Factorial(n) / UTIL_Factorial((n)-(r)) / UTIL_Factorial(r))
 #define nPr(n, r) (UTIL_Factorial(n) / UTIL_Factorial((n)-(r)))
+
+template<typename Iterator>
+Iterator UTIL_SelectRandom(Iterator start, Iterator end) {
+	
+	if (start == end) return end;
+	
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, std::distance(start, end) - 1);
+	std::advance(start, dis(gen));
+	return start;
+}
 
 #endif

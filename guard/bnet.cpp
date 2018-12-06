@@ -158,7 +158,7 @@ CBNET::CBNET( CGHost *nGHost, string nServer, string nServerAlias, string nBNLSS
 	m_LastGoPressed=0;
 
 	m_Users.push_back(new CDBChannel(m_UserName,GetTime(),7, false, false));
-	m_OnlineUsers.push_back(m_UserName);	
+	m_OnlineUsers.insert(m_UserName);	
 
 	//meplay command
 	m_SignLock = false;
@@ -579,7 +579,7 @@ bool CBNET::Update(void *fd, void *send_fd) {
 		string temp;
 		uint32_t UsersInTemp=0;
 		SendChatCommand(m_MassMessageCalledBy,"Users in games.");
-		for (vector<string>::iterator j = m_OnlineUsers.begin(); j != m_OnlineUsers.end(); j++ ) {
+		for (set<string>::iterator j = m_OnlineUsers.begin(); j != m_OnlineUsers.end(); j++ ) {
 			if (*j!=m_UserName) {
 				temp+=*j+"   ";
 				UsersNumber++;
@@ -2135,6 +2135,9 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 					}
 
 					if (Command=="ag" && !Payload.empty()) {
+
+						CONSOLE_Print("Received ag command with payload: " + Payload);
+
 						stringstream SS;
 						SS << Payload;
 						string tbl[11]={"","","","","","","","","","",""};
@@ -5853,8 +5856,8 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 			if (Message.find("currently in channel") != string::npos && UserName != "User") {
 				m_InChannelUsers.push_back(UserName);
 			}
-            else if (Message.find("was last seen on") == string::npos && UserName != "User") {
-				m_OnlineUsers.push_back(UserName);
+			else if (!Message.find("was last seen on") != string::npos && UserName != "User") {
+				m_OnlineUsers.insert(UserName);
 			}
 		}
 		else {
@@ -7406,30 +7409,17 @@ bool CBNET::IsInPool(string name) {
 }
 
 string CBNET::GetRandomUser() {
-	string temp[20];
-	uint32_t counter=0;
-	uint32_t r_numb=0;
-	for (vector<CDBChannel *>::iterator i = m_Users.begin(); i != m_Users.end(); i++) {
-		if ((*i)->GetSigned( ) && counter < 20) {
-			temp[counter]=(*i)->GetUser();
-			counter++;
-		}
-	}
+    vector<string> signedPlayers;
+    for (vector<CDBChannel *>::iterator i = m_Users.begin(); i != m_Users.end(); i++) {
+        if ((*i)->GetSigned( )) {
+            signedPlayers.push_back((*i)->GetUser());
+        }
+    }
+    if (signedPlayers.size() == 0) {
+        return "No players in pool.";
+    }
 
-	if (counter>0) {
-        r_numb = rand()%counter;
-
-		while(!temp[r_numb].empty( )) {
-			r_numb = rand()%counter;
-			if (!temp[r_numb].empty()) {
-				return temp[r_numb];
-			}
-		}
-	}
-	else {
-		return "No user in pool list";
-	}
-	return "Error";
+    return *UTIL_SelectRandom(signedPlayers.begin(), signedPlayers.end());
 }
 
 void CBNET::PrintPool(string name) {

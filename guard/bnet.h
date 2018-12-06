@@ -173,7 +173,7 @@ private:
 	vector<CDBMaps *> m_Maps;
 	vector<CDBChannel *> m_Users;					// vector of users in channel
 	vector<CDBHostBot *> m_HostBots;
-	vector<string> m_OnlineUsers;
+	set<string> m_OnlineUsers;
 	vector<string> m_InChannelUsers;
 	vector<string> m_MuteUsers;
 	

@@ -2754,7 +2754,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 					}
 
 					if (m_GHost->commands[60])
-					if (Command == "exit" || Command == "quit" && IsRootAdmin(User)) {
+                    if ((Command == "exit" || Command == "quit") && IsRootAdmin(User)) {
 						if (Payload=="all") 	{
 							SendChatCommand(User,"Closing hostbots.");
 							for (vector<CDBInfo *>::iterator j = m_Infos.begin(); j != m_Infos.end(); j++ ) {
@@ -2783,7 +2783,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 				/*********************
 				*      lvl 4         *
 				*********************/
-				if (Accesslvl==4 && !m_RootOnly || Accesslvl==5) {					
+                if ((Accesslvl==4 || Accesslvl==5) && !m_RootOnly) {
 					
 					if (Command=="see" && !Payload.empty( )) {
 						uint32_t id = UTIL_ToUInt32(Payload);
@@ -3117,7 +3117,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 					}
 	
 					if (m_GHost->commands[50])
-					if (Command == "mod" || Command == "moderate" && Payload.empty()) {
+                    if ((Command == "mod" || Command == "moderate") && Payload.empty()) {
 						ChannelModerate();
 					}
 					
@@ -3149,7 +3149,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 					}
 						
 					if (m_GHost->commands[49])
-					if (Command =="devoice" || Command== "dev"&& !Payload.empty()) {
+                    if ((Command =="devoice" || Command== "dev") && !Payload.empty()) {
 						transform( Payload.begin( ), Payload.end( ), Payload.begin( ), (int(*)(int))tolower );
 						uint32_t Matches=0;
 						string TestName;
@@ -3904,7 +3904,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 					}
 
 					if (m_GHost->commands[27])
-					if (Command=="cbandel"|| Command=="delcban" &&!Payload.empty()) {					
+                    if ((Command=="cbandel" || Command=="delcban") && !Payload.empty()) {
 						CDBWarn *temp=IsWarn(Payload);
 						if (temp) {
 							if (temp->GetDaysban()>0) {
@@ -5853,7 +5853,7 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 			if (Message.find("currently in channel") != string::npos && UserName != "User") {
 				m_InChannelUsers.push_back(UserName);
 			}
-			else if (!Message.find("was last seen on") != string::npos && UserName != "User") {
+            else if (Message.find("was last seen on") == string::npos && UserName != "User") {
 				m_OnlineUsers.push_back(UserName);
 			}
 		}
@@ -7415,8 +7415,10 @@ string CBNET::GetRandomUser() {
 			counter++;
 		}
 	}
-	r_numb = rand()%counter;
+
 	if (counter>0) {
+        r_numb = rand()%counter;
+
 		while(!temp[r_numb].empty( )) {
 			r_numb = rand()%counter;
 			if (!temp[r_numb].empty()) {

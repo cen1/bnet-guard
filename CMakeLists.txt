@@ -12,7 +12,7 @@ file(GLOB SOURCE
 file(GLOB HEADERS
     "guard/*.h"
 )
-set(CMAKE_MODULE_PATH CMake/Modules)
+set(CMAKE_MODULE_PATH /home/cen/git/bnet-guard/CMake/Modules)
 
 add_definitions( -DBOOST_ALL_DYN_LINK )
 
@@ -33,8 +33,8 @@ if (WIN32)
 endif()
 
 if (NOT WIN32)
-	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pthread" )
-	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lpthread -ldl" )
+	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pthread -Wlifetime -Wno-lifetime-pointer-arithmetic -Wno-lifetime-null" )
+	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lpthread -ldl -lm -lstdc++" )
 endif()
 
 find_package(BNCSUTIL REQUIRED)

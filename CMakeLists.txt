@@ -25,7 +25,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 
 if (WIN32)
 	target_compile_options(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-	target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)
+	target_link_libraries(${PROJECT_NAME} PRIVATE wsock32 ws2_32)
 	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/include)
 	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/lib)
 endif()
@@ -43,7 +43,7 @@ find_package(MYSQL REQUIRED)
 find_package(Boost COMPONENTS filesystem system date_time thread chrono REQUIRED)
 
 include_directories(guard ${BNCSUTIL_INCLUDE_DIRS} ${MYSQL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${BNCSUTIL_LIBRARIES} ${MYSQL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${BNCSUTIL_LIBRARIES} ${MYSQL_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS guard RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 

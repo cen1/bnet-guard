@@ -20,21 +20,22 @@ add_executable(guard ${SOURCE} ${HEADERS})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME guard)
 
-if(UNIX)
-    set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-	set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
-endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 
 if (WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS")
+	target_compile_options(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 	target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)
-	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/include")
-	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/lib")
+	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/include)
+	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/lib)
 endif()
 
 if (NOT WIN32)
-	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pthread -Wlifetime -Wno-lifetime-pointer-arithmetic -Wno-lifetime-null" )
-	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lpthread -ldl -lm -lstdc++" )
+	target_link_libraries(${PROJECT_NAME} PRIVATE -lpthread -lm -lstdc++ ${CMAKE_DL_LIBS})
+endif()
+
+if (ENABLE_LIFETIME)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wlifetime -Wno-lifetime-pointer-arithmetic -Wno-lifetime-null)
 endif()
 
 find_package(BNCSUTIL REQUIRED)

@@ -14,6 +14,13 @@ Guard is a bnet chat bot based on ghost++ for managing DotA and CG leagues. It t
 
 You need `cmake` and either clang, gcc or visualc++ build chain to build the project.
 
+# CMake custom variables
+
+Enable clang experimental lifetime checks.
+```
+-DENABLE_LIFETIME=1
+```
+
 # Building
 
 *nix

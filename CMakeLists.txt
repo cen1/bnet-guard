@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "0")
-SET(VERSION_PATCH "0")
+SET(VERSION_PATCH "1")
 
 file(GLOB SOURCE
     "guard/*.cpp"
@@ -12,7 +12,7 @@ file(GLOB SOURCE
 file(GLOB HEADERS
     "guard/*.h"
 )
-set(CMAKE_MODULE_PATH /home/cen/git/bnet-guard/CMake/Modules)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
 add_definitions( -DBOOST_ALL_DYN_LINK )
 
@@ -26,8 +26,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 if (WIN32)
 	target_compile_options(${PROJECT_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 	target_link_libraries(${PROJECT_NAME} PRIVATE wsock32 ws2_32)
-	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/include)
-	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/lib)
+	set(BOOST_INCLUDEDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/include")
+	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/depends/boost/lib")
 endif()
 
 if (NOT WIN32)

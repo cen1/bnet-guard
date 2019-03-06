@@ -3577,8 +3577,8 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 
 					if (m_GHost->commands[33])
 					if (Command=="clvl" && !Payload.empty()) {
-						uint32_t ll=Info->GetLvl();
-						uint32_t lvl=1;
+						uint32_t invokingUserLvl=Info->GetLvl();
+						uint32_t newLvl=1;
 						uint32_t victimlvl=1;
 						string Victim;
 						string Reason; 
@@ -3596,28 +3596,48 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 						if (Reason=="0" || Reason=="1" || Reason=="2" || Reason=="3" || Reason=="4" || Reason=="5" || Reason=="6" || Reason=="7") {
 							string tempname = m_UserName;
 							transform( tempname.begin( ), tempname.end( ), tempname.begin( ), (int(*)(int))tolower );
-							lvl=UTIL_ToUInt32(Reason);// lvl you want to give
-							// reason = lvl victim = user  ll= users lvl
+							newLvl = UTIL_ToUInt32(Reason);
 							CDBInfo *temp = IsInfo(Victim);
 							if (temp) {
 								victimlvl=temp->GetLvl();
+								bool applyChange = true;
 
-								if (victimlvl == 6 && lvl != 6) {
-									DelHostbot(Victim);
+								//Remove hostbot
+								if (victimlvl == 6 && newLvl != 6) {
+									if (IsRootAdmin(User)) {
+										DelHostbot(Victim);
+									}
+									else {
+										SendChatCommand(User, "Changing lvl 6 is reserved for root");
+										applyChange = false;
+									}
+								}
+								//Add hostbot
+								if (newLvl == 6 && victimlvl != 6) {
+									if (IsRootAdmin(User)) {
+										m_HostBots.push_back(new CDBHostBot(Victim, 1, 0, 10));
+										SendChatCommand(Victim, UTIL_ToString(m_CommandTrigger) + "gethb");
+									}
+									else {
+										applyChange = false;
+										SendChatCommand(User, "Changing lvl 6 is reserved for root");
+									}
 								}
 
-								if (((ll>lvl&&ll>victimlvl)|| IsRootAdmin(User))) {
-									if (lvl==0) {
-										if (m_GHost->m_IsOperator) {
-											SendChatCommand("/ban " + Victim + " from: " + User);
+								if (((invokingUserLvl > newLvl && invokingUserLvl > victimlvl) || IsRootAdmin(User))) {
+									if (newLvl == 0) {
+										if (invokingUserLvl == 5 || IsRootAdmin(User)) {
+											if (m_GHost->m_IsOperator) {
+												SendChatCommand("/ban " + Victim + " from: " + User);
+											}
+											else {
+												SendChatCommand("/kick " + Victim + " from: " + User);
+											}
 										}
 										else {
-											SendChatCommand("/kick " + Victim + " from: " + User);
+											SendChatCommand(User, "Only lvl 5 can clvl 0");
+											applyChange = false;
 										}
-									}
-									else if (lvl == 6 && victimlvl != 6) {
-										m_HostBots.push_back( new CDBHostBot(Victim, 1, 0, 10 ));
-										SendChatCommand(Victim,UTIL_ToString(m_CommandTrigger)+"gethb");
 									}
 									else {
 										if (m_GHost->m_IsOperator && victimlvl == 0) {
@@ -3625,34 +3645,39 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 										}
 									}
 									
-									m_PairedInfoUpdateLvls.push_back( PairedInfoUpdateLvl( Whisper ? User : string( ), m_GHost->m_DB->ThreadedInfoUpdateLvl( m_Server, Victim,lvl,User ) ) );
-									if (lvl == 0) {
-										SendChatCommand(User, "You ban " + Victim + " from channel. lvl: " + UTIL_ToString(lvl));
+									if (applyChange) {
+										m_PairedInfoUpdateLvls.push_back(PairedInfoUpdateLvl(Whisper ? User : string(), m_GHost->m_DB->ThreadedInfoUpdateLvl(m_Server, Victim, newLvl, User)));
+										if (newLvl == 0) {
+											SendChatCommand(User, "You ban " + Victim + " from channel. lvl: " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 3) {
+											SendChatCommand(User, "You make " + Victim + " high lvl captain. lvl: " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 2) {
+											SendChatCommand(User, "You mark " + Victim + " low lvl captain. lvl: " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 1) {
+											SendChatCommand(User, "You change " + Victim + "'s lvl to " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 4) {
+											SendChatCommand(User, "You make " + Victim + " voucher. lvl: " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 5) {
+											SendChatCommand(User, "You make " + Victim + " admin. lvl: " + UTIL_ToString(newLvl));
+										}
+										else if (newLvl == 6) {
+											SendChatCommand(User, "You mark " + Victim + " account as hostbot. lvl: " + UTIL_ToString(newLvl));
+										}
 									}
-									else if (lvl == 3) {
-										SendChatCommand(User, "You make " + Victim + " high lvl captain. lvl: " + UTIL_ToString(lvl));
-									}
-									else if (lvl == 2) {
-										SendChatCommand(User, "You mark " + Victim + " low lvl captain. lvl: " + UTIL_ToString(lvl));
-									}
-									else if (lvl == 1) {
-										SendChatCommand(User, "You change " + Victim + "'s lvl to " + UTIL_ToString(lvl));
-									}
-									else if (lvl == 4) {
-										SendChatCommand(User, "You make " + Victim + " voucher. lvl: " + UTIL_ToString(lvl));
-									}
-									else if (lvl == 5) {
-										SendChatCommand(User, "You make " + Victim + " admin. lvl: " + UTIL_ToString(lvl));
-									}
-									else if (lvl == 6) {
-										SendChatCommand(User, "You mark " + Victim + " account as hostbot. lvl: " + UTIL_ToString(lvl));
+									else {
+										SendChatCommand(User, "clvl aborted");
 									}
 								}
 							}
 							else {								
-								if (((ll>lvl)||IsRootAdmin(User))) {
+								if (((invokingUserLvl > newLvl) || IsRootAdmin(User))) {
 									SendChatCommand(User, Victim + " doesn't have info in db. Adding now with lvl "+Payload+"!!!" );
-									if (lvl==0) {
+									if (newLvl == 0) {
 										if (m_GHost->m_IsOperator) {
 											SendChatCommand("/ban " + Victim + " from: " + User);
 										}
@@ -3660,16 +3685,16 @@ void CBNET::ProcessChatEvent( CIncomingChatEvent *chatEvent ) {
 											SendChatCommand("/kick " + Victim + " from: " + User);
 										}
 									}
-									else if (lvl == 6) {
+									else if (newLvl == 6) {
 										m_HostBots.push_back( new CDBHostBot(Victim, 1, 0, 10 ));
 										SendChatCommand(Victim,UTIL_ToString(m_CommandTrigger)+"gethb");
 									}
 
-									m_PairedInfoAdds.push_back( PairedInfoAdd( Whisper ? User : string( ), m_GHost->m_DB->ThreadedInfoAdd( m_Server, Victim,lvl,m_Infos.size( )+1, m_Infos.size( )+1, 0, 0, User, "??", 0, 0,"-",1 ) ) );
+									m_PairedInfoAdds.push_back(PairedInfoAdd( Whisper ? User : string(), m_GHost->m_DB->ThreadedInfoAdd(m_Server, Victim, newLvl, m_Infos.size()+1, m_Infos.size()+1, 0, 0, User, "??", 0, 0, "-", 1)));
 								}
 							}
 
-							if (ll == lvl && !IsRootAdmin(User)) {
+							if (invokingUserLvl == newLvl && !IsRootAdmin(User)) {
 								SendChatCommand(User, "You can 't do user same lvl as yours. Only root admin can.");
 							}
 							if (User == Victim && (!IsRootAdmin(User))) {

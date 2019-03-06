@@ -239,7 +239,7 @@ Format \<comman trigger>\<command name> <params...>
 
 **lvl [player | 1-6]** -prints your or player's level or players at specified level
 
-**clvl \<player> <newlvl>** - changes player's level
+**clvl \<player> <newlvl>** - changes player's level. Only root can clvl 6. Only lvl 5 can clvl 0.
 
 **cm \<country> <text>** - sends mass message to players from country
 

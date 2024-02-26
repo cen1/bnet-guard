@@ -1,57 +1,26 @@
 # bnet-guard
 
-*Major refactor was done prior to the public release but there are still some areas with "bad code" which accumulated from the early days. We will take care of these in due time.*
-
-Guard is a bnet chat bot based on ghost++ for managing DotA and CG leagues. It takes care of channel management, player warns and bans, player level access, delegating game hosting to ghost++ hostbots and collecting game stats. It also includes a challenge system for professional DotA gaming. You can use guard for channel management only or connect 1 or more slaves which act as game hosts, see [bnet-host](https://github.com/cen1/bnet-host) project. The number of slaves determines how many games can be in lobby simultaneously.
-
-# Supported operating systems
-
--Linux  
--FreeBSD  
--Windows
+Guard is a bnet chat bot based on ghost++ for managing DotA and Custom Game leagues. It takes care of channel management, player warns and bans, player level access, delegating game hosting to ghost++ hostbots and collecting game stats.
+It also includes a challenge system for professional DotA gaming. You can use guard for channel management only or connect 1 or more slaves which act as game hosts, see [bnet-host](https://github.com/cen1/bnet-host) project. 
+The number of slaves determines how many games can be in lobby simultaneously.
 
 # Build tools
 
-You need `cmake` and either clang, gcc or visualc++ build chain to build the project.
+- cmake
+- clang, gcc or visualc++
 
-# CMake custom variables
+# Dependencies
 
-Enable clang experimental lifetime checks.
-```
--DENABLE_LIFETIME=1
-```
-
-# Building
-
-*nix
-
-```
-cmake -G "Unix Makefiles" -H./ -B./build
-cd build
-make
-```
-
-Windows
-
-```
-cmake -G "Visual Studio 14 2015" -H./ -B./build
-# now open .sln file in build directory, build from Visual Studio
-```
-
-Enable verbose builds with `-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON`
-
-## Dependencies
-
-`bnet-guard` depends on:  
--bncsutil  
--boost  
--mysql  
--udpserver.dll (win only)  
+- bncsutil  
+- boost  
+- mysql
+- gtest
+- udpserver.dll (win only)
 
 ### Dependency installation on Linux
 
 ```
-apt-get install build-essential libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev libmysqlclient-dev
+sudo apt-get install build-essential libboost-filesystem-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev default-libmysqlclient-dev libgtest-dev
 ```
 For bncsutil see the [bncsutil GitHub repo](https://github.com/BNETDocs/bncsutil).
 
@@ -75,17 +44,86 @@ depends/[mysql,bncsutil,boost]/include
 [Boost](https://www.boost.org/) - You only need to build the following components: filesystem, system, thread, chrono, date-time  
 [Bncsutil](https://github.com/BNETDocs/bncsutil)
 
+# Building
+
+## Linux
+```
+cmake -G "Unix Makefiles" -B./build
+cd build
+cmake --build . --config Release
+ctest
+```
+
+## Windows
+
+```
+cmake -G "Visual Studio 17 2022" -B./build
+cd build
+cmake --build . --config Release
+# alternatively, open .sln file, build from Visual Studio
+```
+
+Enable verbose builds with `-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON`
+
+# RPM and DEB packages
+You can download deb and rpm from github release page. Install with `gdebi <package>.deb` or `dnf install <package>.rpm`.
+Binaries and configs are installed to `/opt/bnet-guard`.
+
 # Installation
 
 ## Database
 Create tables in MySQL database using the `mysql_create_tables.sql` script.
 
-## Prepare to run
-Put the guard binary and guard.cfg in the same folder. Change guard.cfg as needed, then run with `./guard` or in screen `screen -dmS guard ./guard`.
+## Configuration
+In the default ghost.cfg you should change at least the following settings:
+```
+bot_war3path
+db_mysql_server
+db_mysql_database
+db_mysql_user
+db_mysql_password
+bnet_server
+bnet_username
+bnet_password
+bnet_rootadmin
+bot_mappath
+```
+
+In `bot_war3path` directory you need to have the following game files:
+- game.dll
+- Storm.dll
+- war3.exe
+- war3patch.mpq
+
+## Run
+Run with `./guard` or in screen `screen -dmS guard ./guard`.
 
 You need a valid bnet account which the bot will use to connect to the specified realm. You can then command the bot from channel or by whispering. Use <command trigger>help for full list of commands (e.g. /w myguard !help).
 
 Bot account should have channel OP for some functionality to work (safelist, kick, ban etc).
+
+## Docker build
+
+```
+docker build -t xpam/guard:latest .
+```
+
+## Run with docker
+
+You can mount `docker/guard.cfg` or set the environment in `docker-compose.yml`.  
+ENV takes precedent. Name of the ENV variable is the same as the name in ghost.cfg but uppercase.
+
+You can mount `/app/guard.log` to export a log file to host.
+
+You will also need to create a directory `docker/wc3_1285` with the following files from your Warcraft installation:
+- game.dll
+- Storm.dll
+- war3.exe
+- war3patch.mpq
+
+```
+docker compose up -d
+```
 
 # Usage
 
@@ -433,7 +471,3 @@ No specific commands.
 ## Icon system
 
 If guard account has sufficient realm access, it can set battle.net icons to players depending on their rank. This way the rank of the player is visually represented inside the channel. Icon system needs to be enabled in the configuration file and works automatically.
-
-## RPM and DEB repos
-RPM and DEB packages will be available once the code is completely cleaned up.
-

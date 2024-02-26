@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  guard:
+    image: xpam/guard:latest
+    environment:
+      TODO: "todo"
+    volumes:
+      - ./docker/guard.cfg:/app/guard.cfg:ro
+      - ./docker/wc3_1285:/app/wc3_1285:ro
+      #- ./docker/guard.log:/app/guard.log:rw
+    depends_on:
+      mysql:
+        condition: service_healthy
+    # Uncomment to debug issues from inside the container
+    #command: "-f /dev/null"
+    #entrypoint: /usr/bin/tail
+    #tty: true
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: guard
+      MYSQL_DATABASE: guard
+      MYSQL_USER: guard
+      MYSQL_PASSWORD: guard
+    ports:
+      - "127.0.0.1:33307:3306"
+    volumes:
+      - guard-mysql-data:/var/lib/mysql
+      - ./mysql_create_tables.sql:/docker-entrypoint-initdb.d/mysql_create_tables.sql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+
+
+volumes:
+  guard-mysql-data:

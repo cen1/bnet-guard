@@ -8,3 +8,7 @@ depends/boost/include/
 depends/mysql/include/
 depends/bncsutil/include/
 test/depends/gtest/include/
+cmake-*
+.idea/
+docker/wc3_1285
+docker/guard.log

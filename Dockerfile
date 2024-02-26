@@ -1,4 +1,4 @@
-FROM kitware/cmake:ci-debian12-x86_64-2023-07-27 as builder
+FROM debian:bookworm as builder
 
 WORKDIR /app
 COPY . .
